@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <title>Mi web de Star Wars</title>
+</head>
+<body style="background-color: black;">
+    <img style="display: block; margin: 0 auto" src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6c/Star_Wars_Logo.svg/1024px-Star_Wars_Logo.svg.png ">
+    <div class="container">
+    <div style="text-align: center;">
+    <h3 style="color:yellow">Bienvenido a mi web de Star Wards</h3>
+    <button class="btn btn-success" onClick="search()">Buscar personajes</button>
+    </div>
+    <div id="results">
+
+    </div>
+    <div style="text-align: right; margin: 10px" id="footerPage">
+        <button id="buttonBack" style="display:none" onclick="back()" class="btn btn-warning"><<</button>
+        <button id="buttonNext" style="display:none" onclick="next()" class="btn btn-success">>></button>
+    </div>
+    </div>
+</body>
+    <script>
+
+        var nextPage = "";
+        var lasPage = "";
+        var currentApiURL = "";
+
+        function next(){
+            currentApiURL = nextPage;
+            FindStarWarsPeople();
+        }
+        function back(){
+            currentApiURL = lastPage;
+            FindStarWarsPeople();
+        }
+
+        function search(){
+            currentApiURL = "https://swapi.dev/api/people";
+            FindStarWarsPeople();
+        }
+
+        function FindStarWarsPeople(){
+            
+            document.getElementById("results").innerHTML="";
+            debugger;
+            var data = undefined;
+            var request = new XMLHttpRequest();
+            request.open('GET', currentApiURL, true);
+            request.send();
+
+            request.onreadystatechange = function(){
+                if(this.readyState == 4 && this.status == 200){
+                    var resultRawData = this.response;
+                    data = JSON.parse(resultRawData);
+                    showApiData(data);
+                }
+            }
+        }
+    </script>
+
+    <script>
+        function showApiData (data){
+                    debugger;
+                    var element = document.getElementById("results");
+                    var countingHtml = document.createElement('h4');
+                    countingHtml.style.color = "yellow";
+                    countingHtml.innerHTML = "Cantidad de personajes encontrados: " + data.count;
+                    element.appendChild(countingHtml);
+
+                    for(var i = 0; i < data.results.length; i++){
+                        
+                        var currentItem = data.results[i];
+                        var personaje = document.createElement('h5');
+                        personaje.style.color = "yellow";
+                        var htmlStyle = "<hr/ ><strong>" + currentItem.name + "</strong><br />";
+                        htmlStyle+= " Genero: " + currentItem.gender;
+                        personaje.innerHTML = htmlStyle;
+
+                        document.getElementById('results').appendChild(personaje);
+                    }
+
+                    if(data.next != null){
+                        document.getElementById("buttonNext").style.display = "inline";
+                        nextPage = data.next;
+                    }
+                    else{
+                        document.getElementById("buttonNext").style.display = "none";
+                    }
+
+                    if(data.previous != null){
+                        document.getElementById("buttonBack").style.display = "inline";
+                        lastPage = data.previous;
+                    }
+                    else{
+                        document.getElementById("buttonBack").style.display = "none";
+                    }
+        }
+    </script>
+
+</html>
